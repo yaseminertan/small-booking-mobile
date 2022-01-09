@@ -18,7 +18,25 @@
             </div>
         </div>
         <p class="text">Nur noch {{ ticketNumber }} Tickets vorhanden.</p>
-       
+        <div class="ticket-select-container">
+            <button class="button minus"
+                    @click="decreaseTicketNumber"
+            >
+                -
+            </button>
+            <span> {{ ticketNumber }} Tickets</span>
+            <button class="button plus" 
+                    @click="increaseTicketNumber"
+            >
+                +
+            </button>
+        </div>
+        <span class="total-price"> {{ totalPrice }} {{currency}}</span>
+        <span class="buy-button"
+              @click="buy"
+        >
+            Jetzt Buchen
+        </span>
        
      </div>
 </template>
@@ -30,8 +48,11 @@ export default {
     name: 'App',
     components: {Header},
     computed:{
+        totalPrice(){
+            return this.selectedTickets.length>0 ? this.selectedTickets.map(item => item.count*item.price).reduce((prev, next) => prev + next, 0) : 0;
+        },
         ticketNumber(){
-            return 0;
+            return this.selectedTickets.length>0 ? this.selectedTickets.map(item => item.count).reduce((prev, next) => prev + next, 0) : 0;
         },
     },
     data: function() {
@@ -60,6 +81,47 @@ export default {
             currency:'EUR',
         };
     },
+    methods:{
+         increaseTicketNumber(){
+            if(document.querySelector('.selected')){
+                const selectedTicketId=document.querySelector('.selected').id;
+                // if there are some tickets added before with same id
+                let selectedTicket=this.selectedTickets.find(x => x.id === selectedTicketId);
+                let price=this.timeSlots.find(x => x.id === selectedTicketId).price.amount;
+
+                if(selectedTicket) 
+                    selectedTicket.count++;
+                else
+                    this.selectedTickets.push({id:selectedTicketId,count:1,price:price});
+            }
+
+            ;
+        },
+        decreaseTicketNumber(){
+            if(document.querySelector('.selected'))
+            {
+                const selectedTicketId=document.querySelector('.selected').id;
+
+                // if there are some tickets added before with same id
+                let selectedTicket=this.selectedTickets.find(x => x.id === selectedTicketId);
+                
+                if(selectedTicket && selectedTicket.count>0) 
+                    selectedTicket.count--;
+            
+            }
+        },
+        selectTime(e){
+            const selectedBox = e.target.classList.contains('time-box') ? e.target : e.target.parentElement ;
+            
+            this.resetBoxSelection();
+            selectedBox.classList.add('selected');
+        },
+        resetBoxSelection:function(){
+            document.querySelectorAll('.time-box').forEach(box=>{
+                box.classList.remove('selected');
+            });
+        },
+    }
 };
 </script>
 
