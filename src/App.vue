@@ -1,10 +1,10 @@
 <template>
-     <div class="container">
+    <div class="container">
         <Header />
         <img class="banner-image"
              src="https://firebasestorage.googleapis.com/v0/b/dynamaze---pwa-1550221436823.appspot.com/o/public%2Fimg%2Fdeals%2Ffunfussball1.png?alt=media&token=448599c6-ffb7-43f4-afc9-dfb82ce426f0" 
         />
-         <div class="time-box-container">
+        <div class="time-box-container">
             <div 
                 :id="time.id"
                 :key="time" 
@@ -19,13 +19,13 @@
         </div>
         <p class="text">Nur noch {{ ticketNumber }} Tickets vorhanden.</p>
         <div class="ticket-select-container">
-            <button class="button minus"
+            <button class="button"
                     @click="decreaseTicketNumber"
             >
                 -
             </button>
             <span> {{ ticketNumber }} Tickets</span>
-            <button class="button plus" 
+            <button class="button" 
                     @click="increaseTicketNumber"
             >
                 +
@@ -37,24 +37,15 @@
         >
             Jetzt Buchen
         </span>
-       
-     </div>
+    </div>
 </template>
 
 <script>
 import Header from '@/components/Header.vue';
 
 export default {
-    name: 'App',
+    name: "App",
     components: {Header},
-    computed:{
-        totalPrice(){
-            return this.selectedTickets.length>0 ? this.selectedTickets.map(item => item.count*item.price).reduce((prev, next) => prev + next, 0) : 0;
-        },
-        ticketNumber(){
-            return this.selectedTickets.length>0 ? this.selectedTickets.map(item => item.count).reduce((prev, next) => prev + next, 0) : 0;
-        },
-    },
     data: function() {
         return {
             timeSlots: [
@@ -76,13 +67,30 @@ export default {
                         currency: "EUR",
                     },
                 },
+                {
+                    id: "3",
+                    ticketAmount: 5,
+                    begin: "12:00",
+                    price: {
+                        amount: 15,
+                        currency: "EUR",
+                    },
+                },
             ],
             selectedTickets:[],
             currency:'EUR',
         };
     },
+    computed:{
+        totalPrice(){
+            return this.selectedTickets.length>0 ? this.selectedTickets.map(item => item.count*item.price).reduce((prev, next) => prev + next, 0) : 0;
+        },
+        ticketNumber(){
+            return this.selectedTickets.length>0 ? this.selectedTickets.map(item => item.count).reduce((prev, next) => prev + next, 0) : 0;
+        },
+    },
     methods:{
-         increaseTicketNumber(){
+        increaseTicketNumber(){
             if(document.querySelector('.selected')){
                 const selectedTicketId=document.querySelector('.selected').id;
                 // if there are some tickets added before with same id
@@ -94,8 +102,6 @@ export default {
                 else
                     this.selectedTickets.push({id:selectedTicketId,count:1,price:price});
             }
-
-            ;
         },
         decreaseTicketNumber(){
             if(document.querySelector('.selected'))
@@ -121,11 +127,23 @@ export default {
                 box.classList.remove('selected');
             });
         },
-    }
+        buy:function(){
+            let alertText="Booking ";
+
+            this.selectedTickets.forEach(ticket=>{
+                const t=this.timeSlots.find(x => x.id === ticket.id);
+                
+                alertText+="at "+t.begin+", "+ticket.count+" tickets at "+ticket.count*ticket.price+this.currency+"; ";
+            });
+            alertText+="succeeded.";
+            alert(alertText);
+        },
+    },
 };
 </script>
 
 <style lang='scss'>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 #app {
     font-family: Montserrat;
     -webkit-font-smoothing: antialiased;
