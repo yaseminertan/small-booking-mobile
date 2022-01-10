@@ -115,7 +115,7 @@ export default {
 
                 // if there are some tickets added before with same id
                 
-                if(this.selectedTicket) 
+                if(this.selectedTicket && this.selectedTicket.count>0) 
                     this.selectedTicket.count--;
             
             }
