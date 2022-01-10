@@ -79,6 +79,8 @@ export default {
             ],
             selectedTickets:[],
             currency:'EUR',
+            selectedTicket:null,
+            selectedSlot:null,
         };
     },
     computed:{
@@ -92,35 +94,45 @@ export default {
     methods:{
         increaseTicketNumber(){
             if(document.querySelector('.selected')){
-                const selectedTicketId=document.querySelector('.selected').id;
-                // if there are some tickets added before with same id
-                let selectedTicket=this.selectedTickets.find(x => x.id === selectedTicketId);
-                let price=this.timeSlots.find(x => x.id === selectedTicketId).price.amount;
+                
+                this.findSelectedSlot()
+                let price=this.selectedSlot.price.amount;
 
-                if(selectedTicket) 
-                    selectedTicket.count++;
-                else
-                    this.selectedTickets.push({id:selectedTicketId,count:1,price:price});
+                // if there are some tickets added before with same id
+                if(this.selectedTicket && this.selectedTicket.count<this.selectedSlot.ticketAmount) 
+                     this.selectedTicket.count++;
+                // add first ticket for this slot
+                else if(!this.selectedTicket)
+                    this.selectedTickets.push({id:this.selectedSlot.id,count:1,price:price});
             }
+            console.log(this.selectedTickets)
+
         },
         decreaseTicketNumber(){
             if(document.querySelector('.selected'))
             {
-                const selectedTicketId=document.querySelector('.selected').id;
+                this.findSelectedSlot()
 
                 // if there are some tickets added before with same id
-                let selectedTicket=this.selectedTickets.find(x => x.id === selectedTicketId);
                 
-                if(selectedTicket && selectedTicket.count>0) 
-                    selectedTicket.count--;
+                if(this.selectedTicket) 
+                    this.selectedTicket.count--;
             
             }
         },
+        // get selections
+        findSelectedSlot(){
+            const selectedTicketId=document.querySelector('.selected').id;
+            this.selectedTicket=this.selectedTickets.find(x => x.id === selectedTicketId);
+            this.selectedSlot=this.timeSlots.find(x => x.id === selectedTicketId);
+        },
+        // selected timeSlot changes
         selectTime(e){
             const selectedBox = e.target.classList.contains('time-box') ? e.target : e.target.parentElement ;
-            
+
             this.resetBoxSelection();
             selectedBox.classList.add('selected');
+            this.findSelectedSlot()
         },
         resetBoxSelection:function(){
             document.querySelectorAll('.time-box').forEach(box=>{
